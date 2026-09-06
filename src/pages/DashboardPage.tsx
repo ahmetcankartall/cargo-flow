@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Container,
 } from 'lucide-react'
+import ShipmentChart from '../features/dashboard/components/ShipmentChart'
 
 function DashboardPage() {
   const stats = [
@@ -75,6 +76,9 @@ function DashboardPage() {
           )
         })}
       </div>
+      <div className="mt-6">
+  <ShipmentChart />
+</div>
     </div>
   )
 }
