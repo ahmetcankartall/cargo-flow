@@ -1,33 +1,79 @@
+import {
+  Package,
+  Truck,
+  ClipboardList,
+  Container,
+} from 'lucide-react'
+
 function DashboardPage() {
+  const stats = [
+    {
+      title: 'Toplam Sevkiyat',
+      value: '248',
+      icon: Package,
+      description: 'Tüm sevkiyatlar',
+    },
+    {
+      title: 'Aktif Sevkiyat',
+      value: '42',
+      icon: Truck,
+      description: 'Şu anda taşımada',
+    },
+    {
+      title: 'Bekleyen Talepler',
+      value: '18',
+      icon: ClipboardList,
+      description: 'Onay bekleyen',
+    },
+    {
+      title: 'Aktif Araçlar',
+      value: '67',
+      icon: Container,
+      description: 'Sistemde aktif',
+    },
+  ]
+
   return (
     <div>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Genel Bakış</h1>
+
         <p className="mt-1 text-gray-500">
           CargoFlow operasyonlarına genel bakış.
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Toplam Sevkiyat</p>
-          <p className="mt-2 text-3xl font-bold">248</p>
-        </div>
+        {stats.map((stat) => {
+          const Icon = stat.icon
 
-        <div className="rounded-xl border bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Aktif Sevkiyat</p>
-          <p className="mt-2 text-3xl font-bold">42</p>
-        </div>
+          return (
+            <div
+              key={stat.title}
+              className="rounded-xl border bg-white p-5 shadow-sm transition hover:shadow-md"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">
+                    {stat.title}
+                  </p>
 
-        <div className="rounded-xl border bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Bekleyen Talepler</p>
-          <p className="mt-2 text-3xl font-bold">18</p>
-        </div>
+                  <p className="mt-2 text-3xl font-bold">
+                    {stat.value}
+                  </p>
+                </div>
 
-        <div className="rounded-xl border bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Aktif Araçlar</p>
-          <p className="mt-2 text-3xl font-bold">67</p>
-        </div>
+                <div className="rounded-lg bg-gray-100 p-2.5">
+                  <Icon size={22} strokeWidth={1.8} />
+                </div>
+              </div>
+
+              <p className="mt-3 text-xs text-gray-500">
+                {stat.description}
+              </p>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
