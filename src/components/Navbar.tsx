@@ -36,7 +36,7 @@ function Navbar() {
   ]
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-gray-100 px-6">
+    <header className="flex h-16 items-center justify-between border-b bg-gray-100 px-16">
       {/* SOL - HIZLI MENÜ */}
       <div className="flex items-center gap-1">
         {menuItems.map((item) => {

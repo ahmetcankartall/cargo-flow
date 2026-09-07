@@ -14,12 +14,40 @@ import {
   ChevronRight,
   Check,
 } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 
-const getSubLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition ${
+const getLinkBaseClass = ({
+  isActive,
+}: {
+  isActive: boolean
+}) =>
+  `group relative flex h-9 w-full items-center rounded-lg text-xs transition-all duration-200 ${
     isActive
-      ? 'bg-gray-100 font-medium text-gray-900'
+      ? 'bg-gray-900 font-medium text-white shadow-sm'
+      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+  }`
+
+const getButtonClass = (isActive: boolean) =>
+  `group relative flex h-9 w-full items-center rounded-lg text-xs font-medium transition-all duration-200 ${
+    isActive
+      ? 'bg-gray-900 text-white shadow-sm'
+      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+  }`
+
+const iconWrapperClass =
+  'absolute left-2.5 flex h-5 w-5 items-center justify-center'
+
+const textClass =
+  'ml-11 whitespace-nowrap transition-opacity duration-200'
+
+const getSubLinkClass = ({
+  isActive,
+}: {
+  isActive: boolean
+}) =>
+  `group flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[11px] transition-all duration-200 ${
+    isActive
+      ? 'bg-gray-100 font-medium text-gray-900 shadow-sm'
       : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
   }`
 
@@ -31,86 +59,158 @@ const SubMenuItem = ({
   children: React.ReactNode
 }) => (
   <NavLink to={to} className={getSubLinkClass}>
-    <span className="ml-1 text-gray-300">○</span>
-    <span>{children}</span>
+    {({ isActive }) => (
+      <>
+        <span
+          className={`relative flex h-4 w-4 shrink-0 items-center justify-center ${
+            isActive ? 'text-gray-900' : 'text-gray-300'
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full transition-all duration-200 ${
+              isActive
+                ? 'scale-100 bg-gray-900'
+                : 'scale-75 bg-gray-300 group-hover:scale-100 group-hover:bg-gray-500'
+            }`}
+          />
+        </span>
+
+        <span className="truncate">{children}</span>
+      </>
+    )}
   </NavLink>
 )
 
-const Sidebar = ({
-  onExpandedChange,
-}: {
-  onExpandedChange: (expanded: boolean) => void
-}) => {
+type SidebarProps = {
+  onExpandedChange?: (expanded: boolean) => void
+}
+
+type MenuOverride = {
+  menu: string | null
+  pathname: string
+}
+
+const Sidebar = ({ onExpandedChange }: SidebarProps) => {
+  const location = useLocation()
+
   const [isPinned, setIsPinned] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
-  const [openMenus, setOpenMenus] = useState({
-    transfers: false,
-    currentAccounts: false,
-    accounts: false,
-    vehicles: false,
-    drivers: false,
-  })
+  const [menuOverride, setMenuOverride] =
+    useState<MenuOverride | null>(null)
 
   const isExpanded = isPinned || isHovered
 
+  const isTransfersActive =
+    location.pathname.startsWith('/operations') ||
+    location.pathname.startsWith('/price-lists') ||
+    location.pathname.startsWith('/locations')
+
+  const isCurrentAccountsActive =
+    location.pathname.startsWith('/current-accounts')
+
+  const isAccountsActive =
+    location.pathname.startsWith('/accounts')
+
+  const isVehiclesActive =
+    location.pathname.startsWith('/vehicles')
+
+  const isDriversActive =
+    location.pathname.startsWith('/drivers')
+
+  const activeMenu =
+    isTransfersActive
+      ? 'transfers'
+      : isCurrentAccountsActive
+        ? 'currentAccounts'
+        : isAccountsActive
+          ? 'accounts'
+          : isVehiclesActive
+            ? 'vehicles'
+            : isDriversActive
+              ? 'drivers'
+              : null
+
+  const currentMenu =
+    menuOverride?.pathname === location.pathname
+      ? menuOverride.menu
+      : activeMenu
+
+  const isTransfersOpen = currentMenu === 'transfers'
+  const isCurrentAccountsOpen = currentMenu === 'currentAccounts'
+  const isAccountsOpen = currentMenu === 'accounts'
+  const isVehiclesOpen = currentMenu === 'vehicles'
+  const isDriversOpen = currentMenu === 'drivers'
+
+  // Herhangi bir akordiyon alt menünün açık olup olmadığını kontrol ediyoruz
+  const isAnyAccordionOpen =
+    isTransfersOpen ||
+    isCurrentAccountsOpen ||
+    isAccountsOpen ||
+    isVehiclesOpen ||
+    isDriversOpen
+
   useEffect(() => {
-    onExpandedChange(isExpanded)
+    onExpandedChange?.(isExpanded)
   }, [isExpanded, onExpandedChange])
 
-  const toggleMenu = (menu: keyof typeof openMenus) => {
-    setOpenMenus((current) => {
-      const isCurrentlyOpen = current[menu]
-
-      return {
-        transfers: false,
-        currentAccounts: false,
-        accounts: false,
-        vehicles: false,
-        drivers: false,
-        [menu]: !isCurrentlyOpen,
-      }
+  const toggleMenu = (menu: string) => {
+    setMenuOverride({
+      pathname: location.pathname,
+      menu: currentMenu === menu ? null : menu,
     })
   }
 
-  const getLinkClass = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-      isActive
-        ? 'bg-gray-100 font-medium text-gray-900'
-        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-    }`
-
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 ${
+      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 ease-in-out ${
         isExpanded ? 'w-64' : 'w-20'
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* LOGO / HEADER */}
-      <div className="flex h-16 items-center border-b border-gray-200 px-4">
-        {/* Logo her zaman gösteriliyor */}
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-900 text-white">
-            <Truck size={20} />
+      {/* HEADER */}
+      <div
+        className={`flex h-16 shrink-0 items-center border-b border-gray-100 ${
+          isExpanded
+            ? 'justify-between px-4'
+            : 'justify-center px-2'
+        }`}
+      >
+        <div
+          className={`flex items-center ${
+            isExpanded ? 'gap-3' : 'justify-center'
+          }`}
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gray-900 text-white shadow-sm">
+            <Truck size={18} strokeWidth={2.2} />
           </div>
-          {isExpanded && (
-            <span className="text-lg font-bold text-gray-900">
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ${
+              isExpanded
+                ? 'w-auto opacity-100'
+                : 'w-0 opacity-0'
+            }`}
+          >
+            <p className="whitespace-nowrap text-sm font-light tracking-tight text-gray-900">
               CargoFlow
-            </span>
-          )}
+            </p>
+
+            <p className="whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.12em] text-gray-400">
+              Logistics
+            </p>
+          </div>
         </div>
 
-        {/* Sadece geniş durumda pin butonu göster */}
         {isExpanded && (
           <button
             type="button"
-            onClick={() => setIsPinned(!isPinned)}
-            className={`ml-auto rounded-lg p-2 transition ${
+            onClick={() => setIsPinned((prev) => !prev)}
+            className={`flex h-7 w-7 items-center justify-center rounded-md transition-all duration-200 ${
               isPinned
-                ? 'bg-gray-100 text-gray-900'
-                : 'text-gray-400 hover:bg-gray-50 hover:text-gray-700'
+                ? 'bg-gray-900 text-white'
+                : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'
             }`}
             title={
               isPinned
@@ -118,63 +218,113 @@ const Sidebar = ({
                 : 'Menüyü sabitle'
             }
           >
-            <Check size={17} />
+            <Check
+              size={14}
+              strokeWidth={2}
+            />
           </button>
         )}
       </div>
 
-      {/* MENU (kalan kısım aynı) */}
-      <nav className="flex-1 overflow-y-auto px-3 py-5">
-        {/* GENEL BAKIŞ */}
-        <div className="mb-6">
-          {isExpanded && (
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+      {/* MENU - Akordiyon kapalıyken veya daraltılmışken scrollbar gizlendi */}
+      <nav
+        className={`flex-1 overflow-x-hidden px-2.5 py-4 transition-all ${
+          isExpanded && isAnyAccordionOpen
+            ? 'overflow-y-auto scrollbar-thin'
+            : 'overflow-y-hidden'
+        }`}
+      >
+        {/* =========================
+            GENEL BAKIŞ
+        ========================== */}
+        <div className="mb-4">
+          {isExpanded ? (
+            <p className="mb-1.5 h-4 px-2.5 text-[9px] font-bold uppercase leading-4 tracking-[0.14em] text-gray-400">
               Genel Bakış
             </p>
+          ) : (
+            <div className="mb-1.5 flex h-4 items-center px-2.5">
+              <div className="h-px w-full bg-gray-200" />
+            </div>
           )}
 
           <NavLink
             to="/dashboard"
-            className={getLinkClass}
-            title={!isExpanded ? 'Dashboard' : undefined}
+            className={({ isActive }) =>
+              getLinkBaseClass({ isActive })
+            }
           >
-            <LayoutDashboard size={18} />
-            {isExpanded && <span>Dashboard</span>}
+            <span className={iconWrapperClass}>
+              <LayoutDashboard size={17} strokeWidth={1.9} />
+            </span>
+
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Dashboard
+            </span>
           </NavLink>
         </div>
 
-        {/* OPERASYON */}
-        <div className="mb-6">
-          {isExpanded && (
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {/* =========================
+            OPERASYON
+        ========================== */}
+        <div className="mb-4">
+          {isExpanded ? (
+            <p className="mb-1.5 h-4 px-2.5 text-[9px] font-bold uppercase leading-4 tracking-[0.14em] text-gray-400">
               Operasyon
             </p>
+          ) : (
+            <div className="mb-1.5 flex h-4 items-center px-2.5">
+              <div className="h-px w-full bg-gray-200" />
+            </div>
           )}
 
           <button
             type="button"
             onClick={() => toggleMenu('transfers')}
-            className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-900"
+            className={getButtonClass(isTransfersActive)}
           >
-            <div
-              className={`flex items-center ${
-                isExpanded ? 'gap-3' : 'justify-center'
-              }`}
-            >
-              <Truck size={18} />
-              {isExpanded && <span>Transferler</span>}
-            </div>
+            <span className={iconWrapperClass}>
+              <ArrowLeftRight
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
 
-            {isExpanded &&
-              (openMenus.transfers ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              ))}
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Transferler
+            </span>
+
+            {isExpanded && (
+              <span className="absolute right-2.5">
+                {isTransfersOpen ? (
+                  <ChevronDown
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                ) : (
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                )}
+              </span>
+            )}
           </button>
 
-          {isExpanded && openMenus.transfers && (
-            <div className="mt-1 space-y-1 pl-4">
+          {isExpanded && isTransfersOpen && (
+            <div className="ml-5 mt-1 space-y-0.5 border-l border-gray-200 pl-2">
               <SubMenuItem to="/operations/summary">
                 Operasyon Özeti
               </SubMenuItem>
@@ -198,39 +348,65 @@ const Sidebar = ({
           )}
         </div>
 
-        {/* HESAPLAR */}
-        <div className="mb-6">
-          {isExpanded && (
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {/* =========================
+            HESAPLAR
+        ========================== */}
+        <div className="mb-4">
+          {isExpanded ? (
+            <p className="mb-1.5 h-4 px-2.5 text-[9px] font-bold uppercase leading-4 tracking-[0.14em] text-gray-400">
               Hesaplar
             </p>
+          ) : (
+            <div className="mb-1.5 flex h-4 items-center px-2.5">
+              <div className="h-px w-full bg-gray-200" />
+            </div>
           )}
 
-          {/* Cari İşlemler */}
           <button
             type="button"
-            onClick={() => toggleMenu('currentAccounts')}
-            className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-900"
+            onClick={() =>
+              toggleMenu('currentAccounts')
+            }
+            className={getButtonClass(
+              isCurrentAccountsActive,
+            )}
           >
-            <div
-              className={`flex items-center ${
-                isExpanded ? 'gap-3' : 'justify-center'
-              }`}
-            >
-              <ArrowLeftRight size={18} />
-              {isExpanded && <span>Cari İşlemler</span>}
-            </div>
+            <span className={iconWrapperClass}>
+              <WalletCards
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
 
-            {isExpanded &&
-              (openMenus.currentAccounts ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              ))}
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Cari İşlemler
+            </span>
+
+            {isExpanded && (
+              <span className="absolute right-2.5">
+                {isCurrentAccountsOpen ? (
+                  <ChevronDown
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                ) : (
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                )}
+              </span>
+            )}
           </button>
 
-          {isExpanded && openMenus.currentAccounts && (
-            <div className="mt-1 space-y-1 pl-4">
+          {isExpanded && isCurrentAccountsOpen && (
+            <div className="ml-5 mt-1 space-y-0.5 border-l border-gray-200 pl-2">
               <SubMenuItem to="/current-accounts">
                 Güncel Durum
               </SubMenuItem>
@@ -253,31 +429,49 @@ const Sidebar = ({
             </div>
           )}
 
-          {/* Hesaplar */}
           <button
             type="button"
             onClick={() => toggleMenu('accounts')}
-            className="mt-1 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-900"
+            className={`${getButtonClass(
+              isAccountsActive,
+            )} mt-1`}
           >
-            <div
-              className={`flex items-center ${
-                isExpanded ? 'gap-3' : 'justify-center'
-              }`}
-            >
-              <WalletCards size={18} />
-              {isExpanded && <span>Hesaplar</span>}
-            </div>
+            <span className={iconWrapperClass}>
+              <Users
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
 
-            {isExpanded &&
-              (openMenus.accounts ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              ))}
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Hesaplar
+            </span>
+
+            {isExpanded && (
+              <span className="absolute right-2.5">
+                {isAccountsOpen ? (
+                  <ChevronDown
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                ) : (
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                )}
+              </span>
+            )}
           </button>
 
-          {isExpanded && openMenus.accounts && (
-            <div className="mt-1 space-y-1 pl-4">
+          {isExpanded && isAccountsOpen && (
+            <div className="ml-5 mt-1 space-y-0.5 border-l border-gray-200 pl-2">
               <SubMenuItem to="/accounts/customers">
                 Müşteriler
               </SubMenuItem>
@@ -305,39 +499,61 @@ const Sidebar = ({
           )}
         </div>
 
-        {/* ARAÇLAR */}
-        <div className="mb-6">
-          {isExpanded && (
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {/* =========================
+            ARAÇLAR
+        ========================== */}
+        <div className="mb-4">
+          {isExpanded ? (
+            <p className="mb-1.5 h-4 px-2.5 text-[9px] font-bold uppercase leading-4 tracking-[0.14em] text-gray-400">
               Araçlar
             </p>
+          ) : (
+            <div className="mb-1.5 flex h-4 items-center px-2.5">
+              <div className="h-px w-full bg-gray-200" />
+            </div>
           )}
 
-          {/* Araçlar */}
           <button
             type="button"
             onClick={() => toggleMenu('vehicles')}
-            className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-900"
+            className={getButtonClass(isVehiclesActive)}
           >
-            <div
-              className={`flex items-center ${
-                isExpanded ? 'gap-3' : 'justify-center'
-              }`}
-            >
-              <CarFront size={18} />
-              {isExpanded && <span>Araçlar</span>}
-            </div>
+            <span className={iconWrapperClass}>
+              <CarFront
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
 
-            {isExpanded &&
-              (openMenus.vehicles ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              ))}
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Araçlar
+            </span>
+
+            {isExpanded && (
+              <span className="absolute right-2.5">
+                {isVehiclesOpen ? (
+                  <ChevronDown
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                ) : (
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                )}
+              </span>
+            )}
           </button>
 
-          {isExpanded && openMenus.vehicles && (
-            <div className="mt-1 space-y-1 pl-4">
+          {isExpanded && isVehiclesOpen && (
+            <div className="ml-5 mt-1 space-y-0.5 border-l border-gray-200 pl-2">
               <SubMenuItem to="/vehicles">
                 Araçlar
               </SubMenuItem>
@@ -356,31 +572,49 @@ const Sidebar = ({
             </div>
           )}
 
-          {/* Sürücüler */}
           <button
             type="button"
             onClick={() => toggleMenu('drivers')}
-            className="mt-1 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-50 hover:text-gray-900"
+            className={`${getButtonClass(
+              isDriversActive,
+            )} mt-1`}
           >
-            <div
-              className={`flex items-center ${
-                isExpanded ? 'gap-3' : 'justify-center'
-              }`}
-            >
-              <Users size={18} />
-              {isExpanded && <span>Sürücüler</span>}
-            </div>
+            <span className={iconWrapperClass}>
+              <Users
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
 
-            {isExpanded &&
-              (openMenus.drivers ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              ))}
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Sürücüler
+            </span>
+
+            {isExpanded && (
+              <span className="absolute right-2.5">
+                {isDriversOpen ? (
+                  <ChevronDown
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                ) : (
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+                )}
+              </span>
+            )}
           </button>
 
-          {isExpanded && openMenus.drivers && (
-            <div className="mt-1 space-y-1 pl-4">
+          {isExpanded && isDriversOpen && (
+            <div className="ml-5 mt-1 space-y-0.5 border-l border-gray-200 pl-2">
               <SubMenuItem to="/drivers">
                 Sürücüler
               </SubMenuItem>
@@ -395,62 +629,181 @@ const Sidebar = ({
             </div>
           )}
 
-          {/* Akaryakıt */}
           <NavLink
             to="/fuels"
-            className={getLinkClass}
-            title={!isExpanded ? 'Akaryakıt' : undefined}
+            className={({ isActive }) =>
+              `${getLinkBaseClass({
+                isActive,
+              })} mt-1`
+            }
           >
-            <Fuel size={18} />
-            {isExpanded && <span>Akaryakıt</span>}
+            <span className={iconWrapperClass}>
+              <Fuel
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
+
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Akaryakıt
+            </span>
           </NavLink>
         </div>
 
-        {/* AYARLAR */}
-        <div>
-          {isExpanded && (
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        {/* =========================
+            AYARLAR
+        ========================== */}
+        <div className="mt-6 border-t border-gray-100 pt-3">
+          {isExpanded ? (
+            <p className="mb-1.5 h-4 px-2.5 text-[9px] font-bold uppercase leading-4 tracking-[0.14em] text-gray-400">
               Ayarlar
             </p>
+          ) : (
+            <div className="mb-1.5 flex h-4 items-center px-2.5">
+              <div className="h-px w-full bg-gray-200" />
+            </div>
           )}
 
           <NavLink
             to="/account"
-            className={getLinkClass}
-            title={!isExpanded ? 'Hesap Bilgileri' : undefined}
+            className={({ isActive }) =>
+              getLinkBaseClass({ isActive })
+            }
           >
-            <UserCircle size={18} />
-            {isExpanded && <span>Hesap Bilgileri</span>}
+            <span className={iconWrapperClass}>
+              <UserCircle
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
+
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Hesap Bilgileri
+            </span>
           </NavLink>
 
           <NavLink
             to="/users"
-            className={getLinkClass}
-            title={!isExpanded ? 'Kullanıcılar' : undefined}
+            className={({ isActive }) =>
+              `${getLinkBaseClass({
+                isActive,
+              })} mt-1`
+            }
           >
-            <Users size={18} />
-            {isExpanded && <span>Kullanıcılar</span>}
+            <span className={iconWrapperClass}>
+              <Users
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
+
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Kullanıcılar
+            </span>
           </NavLink>
 
           <NavLink
             to="/sms-settings"
-            className={getLinkClass}
-            title={!isExpanded ? 'SMS Ayarları' : undefined}
+            className={({ isActive }) =>
+              `${getLinkBaseClass({
+                isActive,
+              })} mt-1`
+            }
           >
-            <MessageSquare size={18} />
-            {isExpanded && <span>SMS Ayarları</span>}
+            <span className={iconWrapperClass}>
+              <MessageSquare
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
+
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              SMS Ayarları
+            </span>
           </NavLink>
 
           <NavLink
             to="/integrations"
-            className={getLinkClass}
-            title={!isExpanded ? 'Entegrasyonlar' : undefined}
+            className={({ isActive }) =>
+              `${getLinkBaseClass({
+                isActive,
+              })} mt-1`
+            }
           >
-            <Plug size={18} />
-            {isExpanded && <span>Entegrasyonlar</span>}
+            <span className={iconWrapperClass}>
+              <Plug
+                size={17}
+                strokeWidth={1.9}
+              />
+            </span>
+
+            <span
+              className={`${
+                isExpanded
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              } ${textClass}`}
+            >
+              Entegrasyonlar
+            </span>
           </NavLink>
         </div>
       </nav>
+
+      {/* FOOTER */}
+      <div
+        className={`shrink-0 border-t border-gray-100 p-2.5 ${
+          isExpanded ? '' : 'flex justify-center'
+        }`}
+      >
+        <div
+          className={`flex items-center rounded-lg bg-gray-50 ${
+            isExpanded
+              ? 'gap-3 px-2.5 py-2'
+              : 'justify-center p-2'
+          }`}
+        >
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-900 text-[10px] font-semibold text-white">
+            AK
+          </div>
+
+          {isExpanded && (
+            <div className="min-w-0">
+              <p className="truncate text-[11px] font-semibold text-gray-800">
+                Ahmet
+              </p>
+
+              <p className="truncate text-[9px] text-gray-400">
+                Yönetici
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
     </aside>
   )
 }

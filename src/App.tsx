@@ -11,6 +11,7 @@ import ReportsPage from './pages/ReportsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 import DashboardLayout from './layouts/DashboardLayout'
+import CurrentAccountStatus from './pages/CurrentAccountStatus'
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
             path="/transport-requests"
             element={<TransportRequestsPage />}
           />
-
+          <Route path="/current-accounts" element={<CurrentAccountStatus />} />
           <Route
             path="/transport-requests/:id"
             element={<TransportRequestDetailPage />}
