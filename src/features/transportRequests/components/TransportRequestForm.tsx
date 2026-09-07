@@ -6,7 +6,15 @@ import {
   type TransportRequestFormData,
 } from '../schemas/transportRequestSchema'
 
-function TransportRequestForm() {
+import type { TransportRequest } from '../types'
+
+interface TransportRequestFormProps {
+  onCreateRequest: (request: TransportRequest) => void
+}
+
+function TransportRequestForm({
+  onCreateRequest,
+}: TransportRequestFormProps) {
   const {
     register,
     handleSubmit,
@@ -16,8 +24,17 @@ function TransportRequestForm() {
   })
 
   const onSubmit = (data: TransportRequestFormData) => {
-    console.log('Yeni taşıma talebi:', data)
+  const now = new Date()
+
+  const newRequest: TransportRequest = {
+    id: `TR-${now.getTime()}`,
+    ...data,
+    status: 'pending',
+    createdAt: now.toISOString().split('T')[0],
   }
+
+  onCreateRequest(newRequest)
+}
 
   return (
     <form
@@ -26,6 +43,7 @@ function TransportRequestForm() {
     >
       <div>
         <h2 className="text-xl font-semibold">Yeni Taşıma Talebi</h2>
+
         <p className="mt-1 text-sm text-gray-500">
           Yeni bir taşıma talebi oluşturun.
         </p>
@@ -99,6 +117,7 @@ function TransportRequestForm() {
             <option value="" disabled>
               Yük türü seçin
             </option>
+
             <option value="general">Genel Kargo</option>
             <option value="food">Gıda</option>
             <option value="chemical">Kimyasal</option>

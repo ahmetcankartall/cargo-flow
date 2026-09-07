@@ -1,16 +1,23 @@
+import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
 
 function DashboardLayout() {
-  return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false)
 
-      <div className="flex min-w-0 flex-1 flex-col">
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Sidebar onExpandedChange={setIsSidebarExpanded} />
+
+      <div
+        className={`min-h-screen transition-all duration-300 ${
+          isSidebarExpanded ? 'ml-64' : 'ml-20'
+        }`}
+      >
         <Navbar />
 
-        <main className="flex-1 p-6">
+        <main className="p-6">
           <Outlet />
         </main>
       </div>

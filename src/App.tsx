@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import TransportRequestsPage from './pages/TransportRequestsPage'
+import TransportRequestDetailPage from './pages/TransportRequestDetailPage'
 import ShipmentsPage from './pages/ShipmentsPage'
 import VehiclesPage from './pages/VehiclesPage'
 import DriversPage from './pages/DriversPage'
@@ -19,10 +20,17 @@ function App() {
 
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
+
           <Route
             path="/transport-requests"
             element={<TransportRequestsPage />}
           />
+
+          <Route
+            path="/transport-requests/:id"
+            element={<TransportRequestDetailPage />}
+          />
+
           <Route path="/shipments" element={<ShipmentsPage />} />
           <Route path="/vehicles" element={<VehiclesPage />} />
           <Route path="/drivers" element={<DriversPage />} />

@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Container,
 } from 'lucide-react'
+import ShipmentStatusChart from '../features/dashboard/components/ShipmentStatusChart'
 import ShipmentChart from '../features/dashboard/components/ShipmentChart'
 
 function DashboardPage() {
@@ -76,8 +77,9 @@ function DashboardPage() {
           )
         })}
       </div>
-      <div className="mt-6">
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
   <ShipmentChart />
+  <ShipmentStatusChart />
 </div>
     </div>
   )
