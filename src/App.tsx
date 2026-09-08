@@ -8,11 +8,11 @@ import ShipmentsPage from './pages/ShipmentsPage'
 import VehiclesPage from './pages/VehiclesPage'
 import DriversPage from './pages/DriversPage'
 import ReportsPage from './pages/ReportsPage'
-import NotFoundPage from './pages/NotFoundPage'
-
 import DashboardLayout from './layouts/DashboardLayout'
 import CurrentAccountStatus from './pages/CurrentAccountStatus'
-
+import OperationsSummaryPage from './pages/OperationsSummaryPage'
+import NotFoundPage from './pages/NotFoundPage'
+import OperationsCurrentPage from './pages/OperationsCurrentPage'
 function App() {
   return (
     <BrowserRouter>
@@ -21,7 +21,14 @@ function App() {
 
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-
+          <Route
+            path="/operations/summary"
+            element={<OperationsSummaryPage />}
+          />
+<Route
+  path="/operations/current"
+  element={<OperationsCurrentPage />}
+/>
           <Route
             path="/transport-requests"
             element={<TransportRequestsPage />}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import Sidebar from '../components/Sidebar'
-import Navbar from '../components/Navbar'
+import Sidebar from '../components/Sidebar/Sidebar'
+import Navbar from '../components/Navbar/Navbar'
 
 function DashboardLayout() {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false)
