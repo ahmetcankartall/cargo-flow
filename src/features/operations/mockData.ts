@@ -1,5 +1,4 @@
-import type { OperationSummary } from './types'
-import type { CurrentOperation } from './types'
+import type { CurrentOperation, OperationSummary } from './types'
 
 export const mockOperationSummaries: OperationSummary[] = [
   {
@@ -55,26 +54,95 @@ export const mockOperationSummaries: OperationSummary[] = [
 export const currentOperations: CurrentOperation[] = [
   {
     id: 'OP-001',
+    status: 'Planlandı',
+    date: '08.09.2026',
+    time: '09:30',
+
     customerName: 'TAV Havalimanları',
-    operationName: 'Adnan Menderes - Çeşme',
     operationType: 'Transfer',
+    operationName: 'Adnan Menderes - Çeşme',
+    passengerCount: 4,
+    mainPassenger: 'Mehmet Kaya',
+
+    operationSerialNo: 'OP-2026-0001',
+    operationCode: 'TRF-001',
+    operationGroup: 'Havalimanı Transfer',
+
+    startLocation: 'İzmir Adnan Menderes Havalimanı',
+    stop: 'Urla',
+    endLocation: 'Çeşme Marina',
+    endCity: 'İzmir',
+
+    endDate: '08.09.2026',
+    endTime: '11:30',
+
     vehicleType: 'Minibüs',
     vehiclePlate: '35 ABC 123',
     driverName: 'Mehmet Yılmaz',
+    driverNote: 'VIP karşılama yapılacak.',
+
+    flightCode: 'TK2321',
+    flightLocation: 'İstanbul - İzmir',
+    flightTime: '08:45',
+    flightTerminal: 'İç Hatlar',
+
+    guide: 'Ayşe Demir',
+    greetingStaff: 'Can Erdem',
+    meetingPoint: 'Geliş terminali çıkış kapısı',
+
+    description: 'Misafirler Çeşme Marina oteline bırakılacaktır.',
+    notifications: 'SMS bildirimi gönderildi.',
+    extraServices: 'Karşılama hizmeti',
+
+    price: 4500,
     subcontractor: 'İzmir VIP Turizm',
   },
 
-
   {
-  id: 'OP-002',
-  customerName: 'XYZ Gıda',
-  operationName: 'İzmir - İstanbul',
-  operationType: 'Transfer',
-  vehicleType: 'Kamyon',
-  vehiclePlate: '35 XYZ 456',
-  driverName: 'Ahmet Demir',
-  subcontractor: 'İzmir VIP Turizm',
-},
+    id: 'OP-002',
+    status: 'Tamamlandı',
+    date: '08.09.2026',
+    time: '14:00',
+
+    customerName: 'XYZ Gıda',
+    operationType: 'Transfer',
+    operationName: 'İzmir - İstanbul',
+    passengerCount: 8,
+    mainPassenger: 'Ahmet Demir',
+
+    operationSerialNo: 'OP-2026-0002',
+    operationCode: 'TRF-002',
+    operationGroup: 'Şehirler Arası Transfer',
+
+    startLocation: 'İzmir Alsancak',
+    stop: 'Manisa',
+    endLocation: 'İstanbul Havalimanı',
+    endCity: 'İstanbul',
+
+    endDate: '08.09.2026',
+    endTime: '20:30',
+
+    vehicleType: 'VIP Minibüs',
+    vehiclePlate: '35 XYZ 456',
+    driverName: 'Ahmet Demir',
+    driverNote: 'Bagaj kapasitesi kontrol edildi.',
+
+    flightCode: 'TK2409',
+    flightLocation: 'İzmir - İstanbul',
+    flightTime: '21:15',
+    flightTerminal: 'Dış Hatlar',
+
+    guide: 'Burak Şahin',
+    greetingStaff: 'Yok',
+    meetingPoint: 'Ana giriş kapısı',
+
+    description: 'Kurumsal misafir transferi.',
+    notifications: 'Operasyon tamamlandı bildirimi gönderildi.',
+    extraServices: 'Bagaj yardımı',
+
+    price: 7800,
+    subcontractor: 'İzmir VIP Turizm',
+  },
 ]
 
 export const currentOperationSummary = {

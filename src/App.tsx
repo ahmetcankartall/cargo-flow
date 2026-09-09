@@ -13,6 +13,8 @@ import CurrentAccountStatus from './pages/CurrentAccountStatus'
 import OperationsSummaryPage from './pages/OperationsSummaryPage'
 import NotFoundPage from './pages/NotFoundPage'
 import OperationsCurrentPage from './pages/OperationsCurrentPage'
+import OperationsPage from './pages/OperationsPage'
+
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +31,7 @@ function App() {
   path="/operations/current"
   element={<OperationsCurrentPage />}
 />
+<Route path="/operations" element={<OperationsPage />} />
           <Route
             path="/transport-requests"
             element={<TransportRequestsPage />}
